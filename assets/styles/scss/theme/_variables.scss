@@ -1,0 +1,45 @@
+$black: #000;
+$light-black: #444343;
+$text-color: rgb(255 255 255 / 75%);
+$gold: #BF9E4B; 
+$medium-gold: #b79a00;
+$light-gold-v1: #e1cc7b;
+$light-gold-v2: #F2D77D; 
+$scroll-opacity-color: rgb(242 215 125 / 10%); 
+$scroll-opacity-zero-color: rgb(242 215 125 / 0); 
+$grey: #aaa; 
+$light-grey: #e9ecef; 
+$white: #fff;
+$blue: #0e6b8a;
+$blue2: #1a1f71;
+$green: #018144;
+$green2: #012c01;
+$DarkBlue: #2e2a7e;
+$red: #e42626;
+$transition: .5s; 
+
+
+/*
+  MIXIN 
+  -----------------------------------------
+*/ 
+@mixin defaultLinearGradient() {
+  background: -webkit-linear-gradient(to right, $light-gold-v2, $gold);
+  background: -moz--linear-gradient(to right, $light-gold-v2, $gold);
+  background: -o--linear-gradient(to right, $light-gold-v2, $gold);
+  background: linear-gradient(to right, $light-gold-v2, $gold);
+}
+
+@mixin linearGradient($color1, $color2) {
+  background: -webkit-linear-gradient(to right, $color1, $color2);
+  background: -moz--linear-gradient(to right, $color1, $color2);
+  background: -o--linear-gradient(to right, $color1, $color2);
+  background: linear-gradient(to right, $color1, $color2);
+}
+
+@mixin transition($all, $seconds, $pattern) {
+  -webkit-transition: $all $seconds $pattern;
+  -moz-transition: $all $seconds $pattern;
+  -o-transition: $all $seconds $pattern;
+  transition: $all $seconds $pattern;
+}

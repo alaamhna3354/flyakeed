@@ -1,0 +1,540 @@
+@import "@/assets/styles/scss/theme/variables";
+@import "@/assets/styles/scss/theme/mixin";
+
+/* 
+  Global Classes
+  --------------------------------------------
+*/
+@font-face {
+  font-family: AcuminVariableConcept;
+  src: url("../font/AcuminVariableConcept.otf");
+}
+@font-face {
+  font-family: ITCEDSCR;
+  src: url("../font/ITCEDSCR.TTF");
+}
+.ar-dir{
+  direction: rtl !important;
+  text-align: start;
+
+}
+body {
+  font-family: AcuminVariableConcept;
+  // &::-webkit-scrollbar { width: 8px; }
+  // &::-webkit-scrollbar-track { background: #f1f1f1; }
+  // &::-webkit-scrollbar-thumb { background: $gold; border-radius: 10px; }
+  // &::-webkit-scrollbar-thumb:hover { background: #555; }
+  @include vertical-scrollbar(8px, "#f1f1f1", $green, "#555");
+  background-color: #eaf2f593;
+
+  *::selection {
+    color: #fff;
+    background: $green;
+  }
+  /* For Mozilla Firefox */
+  *::-moz-selection {
+    color: #fff;
+    background: $green;
+  }
+}
+h1{
+  color: #5e5e5e;
+}
+p{
+  color: #848484;
+}
+a {
+  text-decoration: none;
+}
+ul {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 0;
+}
+.font-philosopher {
+  font-family: Philosopher !important;
+}
+
+.bg-black {
+  background: $black;
+}
+
+.bg-grey {
+  background: $grey;
+}
+
+.bg-gold {
+  background: $gold;
+}
+
+.bg-medium-gold {
+  background: $medium-gold;
+}
+
+.bg-light-gold-v1 {
+  background: $light-gold-v1;
+}
+
+.bg-light-gold-v2 {
+  background: $light-gold-v2;
+}
+
+.bright-white {
+  color: $text-color !important;
+}
+
+.text-gold {
+  color: $gold;
+}
+
+.text-medium-gold {
+  color: $medium-gold;
+}
+
+.text-light-gold-v1 {
+  color: $light-gold-v1;
+}
+
+.text-light-gold-v2 {
+  color: $light-gold-v2;
+}
+
+.text-dark {
+  color: $black;
+}
+
+.text-blue {
+  color: $blue;
+}
+
+.text-grey {
+  color: $grey;
+}
+
+.border-gold {
+  border-color: $gold !important;
+}
+
+.black-hover {
+  &:hover {
+    color: $light-black;
+  }
+}
+
+.blue-hover {
+  @include transition(all, 0.5s, ease);
+  &:hover {
+    color: $blue;
+  }
+}
+
+.white-hover {
+  @include transition(all, 0.5s, ease);
+  &:hover {
+    color: $text-color;
+  }
+}
+
+.responsive {
+  width: 100%;
+  height: 100%;
+  // object-fit: contain;
+  margin: auto !important;
+}
+.img-resposive{
+  object-fit: contain;
+}
+// .header-image { width: 100%; height: 500px; }
+
+.btn-gradient {
+  padding-left: 30px;
+  padding-right: 30px;
+  @include linearGradient($light-gold-v2, $gold);
+  @include transition(all, 0.3s, ease);
+  border-radius: 0;
+  &:hover {
+    filter: drop-shadow(2px 2px 6px #aaa);
+  }
+  &:focus {
+    box-shadow: none;
+  }
+  &:visited {
+    background: red;
+  }
+}
+
+.alert {
+  position: fixed !important;
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+}
+.btn-medium-gold {
+  color: #fff;
+  background-color: $medium-gold;
+  border-color: $medium-gold;
+  &:hover {
+    color: #000;
+    background-color: $light-gold-v2;
+    border-color: $light-gold-v2;
+  }
+}
+.btn-main {
+  background-color: #5e5e5e;
+  color: #fff;
+  padding: 8px 50px;
+  text-align: center;
+  border: none !important;
+  // border-radius: 3px;
+  transition: $transition;
+  font-weight: bold;
+  border: 2px solid #5e5e5e;
+  &:hover {
+    background-color: #fff;
+    color: #5e5e5e;
+    border: 1px solid #5e5e5e !important;
+    // border-color: $green;
+  }
+}
+.btn-main2 {
+  background-color: #fff;
+  color: $blue;
+  padding: 8px 50px;
+  text-align: center;
+  border: none;
+  border-radius: 30px;
+  transition: $transition;
+  font-weight: bold;
+  border: 2px solid $blue;
+  &:hover {
+    background-color: $blue;
+    color: #fff;
+  }
+}
+.btn-custom {
+  background: linear-gradient(90deg, #fbe9b0 0%, $medium-gold 100%);
+  color: #212529;
+  border-radius: 0px;
+  line-height: 38px;
+  width: 100%;
+  text-transform: uppercase;
+  border: none;
+  position: relative;
+  overflow: hidden;
+  color: #fff;
+  padding: 0 30px;
+  &:before {
+    position: absolute;
+    left: -145px;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    content: "";
+    background: #000;
+    opacity: 0;
+    transform: skew(40deg);
+    transition: all 0.3s ease 0s;
+    // left: 180px;
+    opacity: 0;
+  }
+  &:hover:before {
+    left: 500px;
+    opacity: 0.3;
+  }
+  &.primary-btn {
+    display: block;
+    width: max-content;
+  }
+}
+
+.golden-gradient-background {
+  background: -webkit-linear-gradient(
+    90deg,
+    $gold 5%,
+    $medium-gold 20%,
+    $light-gold-v2 40%,
+    $light-gold-v2 60%,
+    $medium-gold 80%,
+    $gold 95%
+  );
+  background: -moz-linear-gradient(
+    90deg,
+    $gold 5%,
+    $medium-gold 20%,
+    $light-gold-v2 40%,
+    $light-gold-v2 60%,
+    $medium-gold 80%,
+    $gold 95%
+  );
+  background: -o-linear-gradient(
+    90deg,
+    $gold 5%,
+    $medium-gold 20%,
+    $light-gold-v2 40%,
+    $light-gold-v2 60%,
+    $medium-gold 80%,
+    $gold 95%
+  );
+  background: linear-gradient(
+    90deg,
+    $gold 5%,
+    $medium-gold 20%,
+    $light-gold-v2 40%,
+    $light-gold-v2 60%,
+    $medium-gold 80%,
+    $gold 95%
+  );
+}
+.truncate {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+.responsive-padding {
+  padding: 1rem 3rem !important;
+  @media (max-width: 767.98px) {
+    padding: 2.5rem !important;
+  }
+  @media (max-width: 400.98px) {
+    padding: 2rem !important;
+  }
+}
+.swiper-button-next:after,
+.swiper-button-prev:after {
+  color: $blue;
+}
+img.custom-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+// Start For Slider In Home In Perfumes
+.PerfumesSlider {
+  height: 600px !important;
+  width: 100% !important;
+
+  .item-slide {
+    height: calc(100% / 3) !important;
+    width: 95% !important;
+  }
+
+  .swiper-pagination-bullet,
+  .swiper-pagination-bullet-active {
+    width: 10px !important;
+    height: 10px !important;
+    border-radius: 0 !important;
+    -webkit-border-radius: 0 !important;
+    -moz-border-radius: 0 !important;
+    -ms-border-radius: 0 !important;
+    -o-border-radius: 0 !important;
+  }
+
+  .swiper-pagination-bullet {
+    background-color: $blue !important;
+    opacity: 0.7 !important;
+  }
+
+  .swiper-pagination-bullet-active {
+    background-color: $blue !important;
+    opacity: 1 !important;
+  }
+
+  @media screen and (max-width: 992px) {
+    .swiper-pagination {
+      right: -2px !important;
+    }
+
+    .item-slide {
+      h3 {
+        font-size: 18px !important;
+      }
+
+      span {
+        font-size: 12px !important;
+      }
+    }
+  }
+  // End For Slider In Home In Perfumes
+}
+// ********************************************************************************
+.flight-result-item {
+  background-color:#fff;
+  padding:0;
+  display:flex;
+  white-space:nowrap;
+  border-radius:3px;
+  margin-bottom:20px
+ }
+ .flight-result-item.wait {
+  border-right:2px solid #fab316
+ }
+ .flight-result-item.avail {
+  border-right:2px solid #4a9a29
+ }
+ .flight-result-item .image-panel {
+  width:150px;
+  display:inline-block;
+  vertical-align:top;
+  border-right:1px solid #ccc
+ }
+ .flight-result-item .desc-panel {
+  width:calc(100% - (30% + 16px));
+  display:inline-block;
+  padding:0 20px
+ }
+ .flight-result-item .desc-panel .desc-itinerary {
+  border:0;
+  padding:5px;
+  display:inline-block;
+  vertical-align:middle;
+  text-align:left
+ }
+ .flight-result-item .desc-panel .desc-itinerary .time {
+  font-size:24px
+ }
+ .flight-result-item .desc-panel .desc-itinerary .txt-duration {
+  color:#b3b3b3;
+  font-size:14px;
+  margin:1px 0 0
+ }
+ .flight-result-item .desc-panel .desc-itinerary .fa {
+  padding:0 20px;
+  vertical-align:middle;
+  font-size:20px
+ }
+ .flight-arrow {
+  position:relative;
+  top:4px
+ }
+ .flight-result-item .desc-panel .desc-others {
+  border:0;
+  display:inline-block;
+  vertical-align:middle;
+  text-align:right;
+  float:right;
+  margin-top:25px;
+  max-width:142px;
+  text-overflow:ellipsis;
+  white-space:inherit;
+  overflow:hidden;
+  text-align:center
+ }
+ .flight-result-item .desc-panel .desc-others h4 {
+  display:inline-block
+ }
+ .flight-result-item .desc-panel .desc-others .text {
+  position:relative;
+  width:150px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis
+ }
+ .flight-result-item .flight-hole {
+  position:relative;
+  width:16px
+ }
+ .flight-result-item .flight-hole:after,
+ .flight-result-item .flight-hole:before {
+  content:'';
+  width:16px;
+  height:16px;
+  background-color:#e6f0ff;
+  position:absolute;
+  left:0;
+  border-radius:50%
+ }
+ .flight-result-item .flight-hole:before {
+  top:-8px
+ }
+ .flight-result-item .flight-hole:after {
+  bottom:-8px
+ }
+ .flight-result-item .price-panel {
+  width:30%;
+  display:inline-block;
+  position:relative
+ }
+ .flight-result-item .price-panel .text-loading {
+  margin:0
+ }
+ .flight-result-item .flight-airline {
+  display:inline-block;
+  vertical-align:middle;
+  text-align:center;
+  max-width:140px;
+  white-space:inherit;
+  width:100%;
+  position:relative
+ }
+ .flight-desc {
+  display:inline-block;
+  width:calc(100% - 155px);
+  white-space:normal;
+  vertical-align:middle
+ }
+ .flight-price .flex-con {
+  display:flex;
+  align-items:center;
+  height:100%;
+  flex-wrap:wrap;
+  text-align:center;
+  justify-content:center
+ }
+ .flight-price .flex-con .full {
+  width:100%
+ }
+ .flight-result-con[data-trip-type="M"] .flight-price .flex-con {
+  align-items:self-end
+ }
+ .flight-price .cur-price {
+  display:inline-block;
+  margin-bottom:5px
+ }
+ .flight-price .cur-price.available {
+  color:#196dfb
+ }
+ .flight-price .cur-price.outpolicy {
+  color:#196dfb
+ }
+ .flight-price .cur-price.outpolicyV2 {
+  color:#196dfb
+ }
+ .flight-price .cur-price.cheapest {
+  color:#5915a0
+ }
+ .flight-price .cur-price.promo {
+  color:#cb538d
+ }
+ .flight-price .cur-price.not {
+  color:#b3b3b3
+ }
+ .flight-price .orig-price {
+  font-size:13px;
+  color:#b3b3b3;
+  display:block;
+  text-decoration:line-through
+ }
+ .flight-price .btn {
+  right:10px;
+  bottom:10px;
+  min-width:70%;
+  font-size:16px;
+  margin:0
+ }
+ .flight-price .btn span {
+  margin-bottom:2px
+ }
+ .flight-price .btn .add-circle-yellow {
+  display:inline-block
+ }
+ .flight-price .btn .add-circle-white {
+  display:none
+ }
+ .flight-price .btn:hover .add-circle-yellow {
+  display:none
+ }
+ .flight-price .btn:hover .add-circle-white {
+  display:inline-block
+ }
