@@ -13,20 +13,20 @@
         <div class="col-3">
           <h5 class="color">{{$i18n.locale == 'ar' ? 'توقف':'Stops'}} </h5>
           <div class="d-flex align-items-center mb-4">
-            <input :checked="selected==0"
+            <input 
               class="checkbox"
               type="checkbox"
               value="0"
-             @change="selectedDirect($event.target.value)" 
+               @change="selected= $event.target.value " 
             />
             <label for="checkbox1">{{$i18n.locale == 'ar' ? 'رحلة مباشرة':'Direct Flight'}}</label>
           </div>
           <div class="d-flex align-items-center mb-4">
-            <input :checked="selected==1"
+            <input 
               class="checkbox"
               type="checkbox"
               value="1"
-             @change="selectedDirect($event.target.value)" 
+            @change="selected= $event.target.value " 
             />
             <label for="checkbox2">{{$i18n.locale == 'ar' ? 'توقف 1':'Stops 1'}} </label>
           </div>
@@ -38,40 +38,55 @@
             :key="index"
           >
             <input
-            :checked="company==key"
+              checked
               class="checkbox"
               type="checkbox"
               :value="key"
-               @change="selectedcompany($event.target.value)" 
+               v-model="company"
             />
+            <!-- :true-value="1"
+                :false-value="0" -->
             <label for="">{{ $i18n.locale == "ar" ? item.ar : item.en }}</label>
           </div>
           <hr>
            <h5 class="color">{{$i18n.locale == 'ar' ? 'الرحلات':'Flights'}}</h5>
            <div class="d-flex align-items-center mb-4">
-            <input :checked="selected==Cheapest"
-              class="checkbox"
-              type="checkbox"
-              value="100"
-             @change="selectedCheapest($event.target.value)" 
-            />
-            <label for="checkbox2"> <img src="/icons/blue2.png" alt="" >{{$i18n.locale == 'ar' ? 'رخيص':'Cheapest'}}</label>
-          </div>
-          <div class="d-flex align-items-center mb-4">
-            <input :checked="selected==Cheapest"
+            <input
+            :checked="Cheapest[0]==300" 
               class="checkbox"
               type="checkbox"
               value="300"
              @change="selectedCheapest($event.target.value)" 
             />
+            <label for="checkbox2"> <img src="/icons/blue2.png" alt="" >{{$i18n.locale == 'ar' ? 'رخيص':'Cheapest'}}</label>
+          </div>
+          <div class="d-flex align-items-center mb-4">
+            <input checked
+              class="checkbox"
+              type="checkbox"
+              value="100000"
+              @change="selectedCheapest($event.target.value)" 
+            />
             <label for="checkbox2"> <img src="/icons/green2.png" alt="" >{{$i18n.locale == 'ar' ? 'متوفر':'Available'}}</label>
           </div>
-         
+          <hr>
+          <h5 class="color">{{$i18n.locale == 'ar' ? 'السعر':'Price'}}</h5>
+    <div class="d-flex justify-content-between mb-5">
+      <span>{{ value[0] }} {{currancy}}</span>
+      <span>{{ value[1] }} {{currancy}}</span>
+    </div>
+              <v-range-slider
+                v-model="value"
+                step="10"
+                :max="1414"
+                :min="299"
+                thumb-label="always"
+              ></v-range-slider>
         </div>
         <div class="col-8">
-            <h3 class="color2 mb-5"> <i style="color:#fc4c9d" class="mdi mdi-airplane"></i>{{$i18n.locale == 'ar' ? 'عدد الرحلات':'Departure Flight'}}  ({{flights.length}}) {{$i18n.locale == 'ar' ? 'في النتائج':'Results'}}  </h3>
-          <div v-for="(item,index) in flights" :key="index"
-          v-show="selected <= item.stops && company.includes(item.marketCode) && item.price > Cheapest "
+            <h3 class="color2 mb-5"> <i style="color:#fc4c9d" class="mdi mdi-airplane"></i>{{$i18n.locale == 'ar' ? 'عدد الرحلات':'Departure Flight'}}  ({{filterByflights.length}}) {{$i18n.locale == 'ar' ? 'في النتائج':'Results'}}  </h3>
+          <div v-for="(item,index) in filterByflights" :key="index"
+          v-show="item.price < Cheapest && item.stops == selected && company.includes(item.marketCode)"
 
             class="animated flight-result-con mb15"
             ctype="1"
@@ -116,15 +131,24 @@
                       </p>
                     </div>
                     <div class="desc-others">
-                     <img src="/icons/green.png" alt="" v-if="item.price > 300">
-                     <img src="/icons/blue.png" alt="" v-if="item.price < 300">
+                     <img src="/icons/gr.png" alt="" v-if="item.price > 300">
+                     <img src="/icons/bl.png" alt="" v-if="item.price < 300">
                     
                       <p
                         class="seat-text available"
                         data-i18n="common.available"
+                         v-if="item.price > 300"
                       >
                         {{$i18n.locale == 'ar' ? 'متوفر':'Available'}}
                       </p>
+                       <p
+                        class="seat-text available"
+                        data-i18n="common.available"
+                        v-if="item.price < 300"
+                      >
+                        {{$i18n.locale == 'ar' ? 'رخيص':'Cheapest'}}
+                      </p>
+                      
                     </div>
                   </div>
                 </div>
@@ -311,59 +335,57 @@ margin: auto;
 }
 }
 </style>
-<script setup>
-const dateStart = localStorage.getItem("dateStart");
-const dateEnd = localStorage.getItem("dateEnd");
-const currancy = localStorage.getItem("currancy");
-const airlines = ref();
-const flights = ref();
-const selected = ref(0);
-const company = ref('XY');
-const loading = ref(false);
-const Cheapest = ref(100);
+<script>
+import axios from 'axios';
 
- const selectedCheapest = (s) => {
-    Cheapest.value = s
- }
- const selectedDirect = (i) => {
-    selected.value = i
- }
-  const selectedcompany = (d) => {
-     company.value = d
+export default {
+  layout: "app",
+  name: "profile",
+  data() {
+    return {   
+    loading:false,
+    dateStart:localStorage.getItem("dateStart"),
+    dateEnd:localStorage.getItem("dateEnd"),
+    currancy:localStorage.getItem("currancy"),
+    airlines:[],
+    flights:[],
+    selected:'0',
+    company:[ "XY", "EY", "GF", "SV", "FZ", "EK", "KU", "QR", "WY", "RJ", "ME", "TK", "ET", "F3" ] ,
+      value: [299, 1414],
+    };
+  },
+  
+  components: {
  
-   
- }
- 
- const filterByflights = computed(() => {
-    //  if (this.filter_name != '') { 
-    //         return this.invitations.filter((item) => {
-    //         return this.filter_name
-    //                    .toLowerCase()
-    //                    .split(" ")
-    //                    .every((v) => item.full_name.toLowerCase().includes(v));
-    //             })   
-    //   }
-      if (selected.value == 2) { 
-            return flights.filter((item) => {
-            return selected.value
-                       .toLowerCase()
-                       .split(" ")
-                       .every((v) => item.stop == 0);
-                })   
-      }
-      if (selected.value == 1) { 
-            return flights.filter((item) => {
-            return selected.value
-                       .toLowerCase()
-                       .split(" ")
-                       .every((v) => item.stop != 0);
-                })   
-      }
-    selected
-    return this.invitations;
- })
-onMounted(async () => {
-  function formatDate(dateStart) {
+  },
+   computed: {
+         filterByflights() {   
+          // if (this.company.length != '') { 
+          //   return this.flights.filter(j => this.company.includes(j.marketCode))
+          // }
+            if (this.value != '') { 
+           return this.flights.filter(item => {
+            return item.price >= this.value[0] && item.price <= this.value[1];
+          })
+          }
+        return this.flights;
+        },
+  },
+   methods: {
+      onPriceChange(values) {
+      this.priceMin = values[0];
+      this.priceMax = values[1];
+    },
+   selectedcompany(d) {
+    if(this.company.includes(d)){
+    this.company-= ' '+d;
+    }
+    else{
+     this.company+= ' '+d;
+    }
+     console.log(this.company)
+  },
+       formatDate(dateStart) {
     var d = new Date(dateStart),
       month = "" + (d.getMonth() + 1),
       day = "" + d.getDate(),
@@ -373,8 +395,8 @@ onMounted(async () => {
     if (day.length < 2) day = "0" + day;
 
     return [year, month, day].join("-");
-  }
-  function formatDate2(dateEnd) {
+  },
+   formatDate2(dateEnd) {
     var d = new Date(dateEnd),
       month = "" + (d.getMonth() + 1),
       day = "" + d.getDate(),
@@ -384,37 +406,58 @@ onMounted(async () => {
     if (day.length < 2) day = "0" + day;
 
     return [year, month, day].join("-");
-  }
-  const data = new URLSearchParams();
-  data.append("from", localStorage.getItem("from"));
-  data.append("to", localStorage.getItem("to"));
-  data.append("city_search", "0");
-  data.append("date", formatDate(dateStart));
-  data.append("ret_date", formatDate2(dateEnd));
-  data.append("currency", localStorage.getItem("currancy"));
-  data.append("adult", localStorage.getItem("Adult"));
-  data.append("child", localStorage.getItem("Child"));
-  data.append("infant", localStorage.getItem("Infant"));
-  data.append("trip_type", "O");
-  data.append("n", true);
-  data.append("cabin[]", "E");
-  const { data: response } = await useFetch(
-    `https://api.flyakeed.com/index.php/gds/flights`,
-    {
-      body: data,
-      method: "POST",
-    }
-  );
-  if (response) {
-    // response.data.airlines flights.render
-    airlines.value = response.value.data.airlines;
-    flights.value = response.value.data.flights.render;
-    // console.log(flights.value);
-    // console.log(response.value.data);
-    loading.value =true
+  },
+     fetch(){
+      var self = this;
+        const data = new URLSearchParams();
+        data.append("from", localStorage.getItem("from"));
+        data.append("to", localStorage.getItem("to"));
+        data.append("city_search", "0");
+        data.append("date", self.formatDate(self.dateStart));
+        data.append("ret_date", self.formatDate2(self.dateEnd));
+        data.append("currency", localStorage.getItem("currancy"));
+        data.append("adult", localStorage.getItem("Adult"));
+        data.append("child", localStorage.getItem("Child"));
+        data.append("infant", localStorage.getItem("Infant"));
+        data.append("trip_type", "O");
+        data.append("n", true);
+        data.append("cabin[]", "E");
+            axios
+            .post(`https://api.flyakeed.com/index.php/gds/flights`, data, {
+            })
+            .then(function(res) {
+              
+              if (res.status == 201 || res.status == 200) { 
+              console.log(res.data.data.flights.render);
+              self.airlines = res.data.data.airlines;
+              self.flights = res.data.data.flights.render;
+              self.loading = true;
+     
+              }
+            })
+             .catch(function(error) {
+              if (error.response) {
+              
+                console.log(error.response);
+              }
+            });
+     }
+  },
+ created() {
+    this.fetch();
+  },
+};
+</script>
+<script setup>
+const Cheapest = ref(100000);
 
-  }
-  
+ const selectedCheapest = (s) => {
+    Cheapest.value = s
+ }
+
+
+
+onMounted(async () => {
  
        
 });

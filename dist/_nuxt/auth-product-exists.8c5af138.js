@@ -1,1 +1,0 @@
-import{I as a,J as u,H as s,K as o}from"./entry.63c94669.js";const i=a(()=>{{const e=u(),t=useCart().value;if(!e.value.isAuthenticated)return s("/auth/login",{redirectCode:301});if(!t.items.length&&t.totalQty<0||t.totalQty==0)return o().back()}});export{i as default};

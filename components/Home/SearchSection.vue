@@ -1,6 +1,6 @@
 <template>
   <!-- <section class="header-slider bg-black"> -->
-<div  class="search-section">
+<div  class="search-section" :class="[$i18n.locale == 'ar'?'':'act']">
   <div class="container">
     <div class="row">
       <div class="col-12 col-md-5">
@@ -236,14 +236,14 @@ const format2 = (date2) => {
  codedfrom.value= cdow;
 setTimeout(() => {
   showcity.value = false;
-}, 500);
+}, 200);
   }
   const setkeywordto = async (krtyw,cod) => {
  keywordto.value= krtyw;
  codedto.value= cod;
 setTimeout(() => {
   showcityto.value = false;
-}, 500);
+}, 200);
   }
 
 </script>
@@ -253,7 +253,9 @@ setTimeout(() => {
   @import '~/assets/styles/scss/theme/variables';
   @import '~/assets/styles/scss/theme/mixin';
 .search-section{
- background-image: url("https://dsx9kbtamfpyb.cloudfront.net/desktop-web-fav4/view/assets/images/landing/en/traveller.jpg");
+ &.act{
+background-image: url("https://dsx9kbtamfpyb.cloudfront.net/desktop-web-fav4/view/assets/images/landing/en/traveller.jpg");
+ }
 .flyakeed-contain{
   background-color: #fff;
   border-radius: 30px;
