@@ -1,6 +1,9 @@
 <template>
   <!-- <section class="header-slider bg-black"> -->
 <div  class="search-section" :class="[$i18n.locale == 'ar'?'':'act']">
+<div class="alert alert-danger" role="alert" v-if="alert">
+  {{$i18n.locale == 'ar' ? 'اختر مسار الرحلة':'Invalid Location'}}
+</div>
   <div class="container">
     <div class="row">
       <div class="col-12 col-md-5">
@@ -84,11 +87,11 @@
                 </ul>
             </div>
            <div class="d-flex mt-5">
-              <div class="From-search active" v-if="date" >
+              <div class="From-search active"  >
               <div class="mb-4" style="color:#196dfb">{{$i18n.locale == 'ar' ? 'تاريخ المغادرة':'Departure Date'}}</div>
                 <vue-date-picker v-model="date" :format="format" :min-date="new Date()"></vue-date-picker>
               </div>
-              <div class="From-search"  v-if="date2">
+              <div class="From-search"  >
               <div class="mb-4"  style="color:#196dfb">{{$i18n.locale == 'ar' ? 'تاريخ العودة':'Return Date'}}</div>
                 <vue-date-picker v-model="date2" :format="format2" :min-date="new Date()"></vue-date-picker>
               </div>
@@ -99,7 +102,7 @@
                 <div class="d-flex justify-content-around">
                   <span class="count">{{Adult}}</span> 
                   <span >
-                  <div><font-awesome-icon @click="Adult++" :icon="['fas', 'angle-up']" /></div>
+                  <div><font-awesome-icon @click="Adultincr" :icon="['fas', 'angle-up']" /></div>
                   <div><font-awesome-icon @click="Adultdecr" :icon="['fas', 'angle-down']" /></div>
                 </span>
                 </div>
@@ -109,7 +112,7 @@
                 <div class="d-flex justify-content-around">
                   <span class="count">{{Child}}</span> 
                   <span >
-                  <div><font-awesome-icon @click="Child++" :icon="['fas', 'angle-up']" /></div>
+                  <div><font-awesome-icon @click="Childincr" :icon="['fas', 'angle-up']" /></div>
                   <div><font-awesome-icon @click="Childdecr" :icon="['fas', 'angle-down']" /></div>
                 </span>
                 </div>
@@ -119,7 +122,7 @@
                 <div class="d-flex justify-content-around">
                   <span class="count">{{Infant}}</span> 
                   <span >
-                  <div><font-awesome-icon @click="Infant++" :icon="['fas', 'angle-up']" /></div>
+                  <div><font-awesome-icon @click="Infantincr" :icon="['fas', 'angle-up']" /></div>
                   <div><font-awesome-icon @click="Infantdecr" :icon="['fas', 'angle-down']" /></div>
                 </span>
                 </div>
@@ -140,7 +143,32 @@ import axios from 'axios';
 const Adult = ref(1);
 const Child = ref(0);
 const Infant = ref(0);
+const alert = ref(false);
 
+ const Adultincr = async () => {
+    if(Adult.value == 10){
+      Adult.value = 10
+    }
+    else{
+      Adult.value++
+    }
+ }
+ const Childincr = async () => {
+    if(Child.value == 10){
+      Child.value = 10
+    }
+    else{
+      Child.value++
+    }
+ }
+ const Infantincr = async () => {
+    if(Infant.value == 10){
+      Infant.value = 10
+    }
+    else{
+      Infant.value++
+    }
+ }
  const Adultdecr = async () => {
     if(Adult.value == 0){
       Adult.value = 0
@@ -191,7 +219,12 @@ const showcityto = ref(false);
   {
     await navigateTo('/flightResult');
   }
-   
+   else{
+     alert.value = true;
+     setTimeout(() => {
+       alert.value = false;
+     }, 4000);
+   }
  }
   const date = ref(new Date());
 const format = (date) => {
@@ -253,13 +286,20 @@ setTimeout(() => {
   @import '~/assets/styles/scss/theme/variables';
   @import '~/assets/styles/scss/theme/mixin';
 .search-section{
+  .alert{
+    position: fixed;
+    top: 5%;
+    z-index: 999;
+    right: 5%;
+    width: 154px;
+  }
  &.act{
 background-image: url("https://dsx9kbtamfpyb.cloudfront.net/desktop-web-fav4/view/assets/images/landing/en/traveller.jpg");
  }
 .flyakeed-contain{
   background-color: #fff;
   border-radius: 30px;
-  margin: 20px 0;
+  margin: 15px 0;
   width: 100%;
 .flyakeed-item  {
   width: 100%;
@@ -274,7 +314,7 @@ background-image: url("https://dsx9kbtamfpyb.cloudfront.net/desktop-web-fav4/vie
   transition: .3s;
   color: #b2b2b2;
   margin: 5px;
-  padding: 5px;
+  padding: 2px;
     &.active{
  background-color: #196dfb;
   color: #fff;
@@ -289,7 +329,7 @@ background-image: url("https://dsx9kbtamfpyb.cloudfront.net/desktop-web-fav4/vie
 }
 .From-search{
   background-color: #f1f1f1;
-  padding: 10px;
+  padding: 5px;
   position: relative;
   ul{
     position: absolute;
@@ -300,7 +340,7 @@ background-image: url("https://dsx9kbtamfpyb.cloudfront.net/desktop-web-fav4/vie
     left: 0;
     overflow-y: scroll;
     scrollbar-width: thin;
-    height: 250px;
+    height: 220px;
     z-index: 100;
     li{
       display: flex;

@@ -350,7 +350,7 @@ export default {
     airlines:[],
     flights:[],
     selected:'0',
-    company:[ "XY", "EY", "GF", "SV", "FZ", "EK", "KU", "QR", "WY", "RJ", "ME", "TK", "ET", "F3" ] ,
+    company:[  ] ,
       value: [299, 1414],
     };
   },
@@ -372,6 +372,10 @@ export default {
         },
   },
    methods: {
+     
+     setCode(values) {
+       console.log(" ********** code **********",values)
+     },
       onPriceChange(values) {
       this.priceMin = values[0];
       this.priceMax = values[1];
@@ -407,7 +411,7 @@ export default {
 
     return [year, month, day].join("-");
   },
-     fetch(){
+   async fetch(){
       var self = this;
         const data = new URLSearchParams();
         data.append("from", localStorage.getItem("from"));
@@ -422,17 +426,18 @@ export default {
         data.append("trip_type", "O");
         data.append("n", true);
         data.append("cabin[]", "E");
-            axios
+           await axios
             .post(`https://api.flyakeed.com/index.php/gds/flights`, data, {
             })
             .then(function(res) {
               
               if (res.status == 201 || res.status == 200) { 
-              console.log(res.data.data.flights.render);
+              // console.log(res.data.data.flights.render);
               self.airlines = res.data.data.airlines;
               self.flights = res.data.data.flights.render;
               self.loading = true;
-     
+              var keys = Object.keys(self.airlines)
+              self.company = keys;
               }
             })
              .catch(function(error) {
