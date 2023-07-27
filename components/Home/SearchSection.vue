@@ -58,6 +58,7 @@
                 <span>{{$i18n.locale == 'ar' ? 'من':'From'}}</span>
               </div>
               <input @input="fetchCities" type="text" v-model="keyword" name="From" :placeholder="$i18n.locale == 'ar' ? 'المدينة أو المطار':'City or Airport'">
+                <span v-if="codedfrom != ''" style="font-size: 22px;color: #1a1f71;right: 25px;position: absolute;">{{codedfrom}}</span>
                 <ul v-if="showcity">
                   <li v-for="item in city" :key="item.id" @click="setkeyword(item.en.name,item.code)">
                     <span>
@@ -66,6 +67,7 @@
                   <strong>
                     {{item.code}}
                   </strong>
+                  <p>{{$i18n.locale == 'ar' ? item.ar.address:item.en.address}},{{$i18n.locale == 'ar' ? item.ar.country:item.en.country}}</p>
                   </li>
                 </ul>
            </div>
@@ -75,6 +77,7 @@
                 <span>{{$i18n.locale == 'ar' ? 'الى':'To'}}</span>
               </div>
               <input @input="fetchto" type="text" v-model="keywordto" name="To" :placeholder="$i18n.locale == 'ar' ? 'المدينة أو المطار':'City or Airport'">
+              <span v-if="codedfrom != ''" style="font-size: 22px;color: #1a1f71;right: 25px;position: absolute;">{{codedto}}</span>
               <ul v-if="showcityto">
                   <li v-for="item in cityto" :key="item.id" @click="setkeywordto(item.en.name,item.code)">
                     <span>
@@ -83,16 +86,32 @@
                   <strong>
                     {{item.code}}
                   </strong>
+                  <p>{{$i18n.locale == 'ar' ? item.ar.address:item.en.address}},{{$i18n.locale == 'ar' ? item.ar.country:item.en.country}}</p>
                   </li>
                 </ul>
             </div>
            <div class="d-flex mt-5">
-              <div class="From-search active"  >
+              <div class="From-search active" >
               <div class="mb-4" style="color:#196dfb">{{$i18n.locale == 'ar' ? 'تاريخ المغادرة':'Departure Date'}}</div>
+               <!-- <span class="depart-whole-date none">{{year}}-{{month}}-{{day}}</span> -->
+               <div class="row">
+                  <div class="col-6"><h1 class="color2">{{day}}</h1></div>
+                  <div class="col-6 color2 fw-bold">
+                    <div>{{monthNames[month-1]}}</div>
+                    <div>{{year}}</div>
+                  </div>
+               </div>
                 <vue-date-picker v-model="date" :format="format" :min-date="new Date()"></vue-date-picker>
               </div>
-              <div class="From-search"  >
+              <div class="From-search" style="margin-inline-start:10px;" >
               <div class="mb-4"  style="color:#196dfb">{{$i18n.locale == 'ar' ? 'تاريخ العودة':'Return Date'}}</div>
+              <div class="row">
+                  <div class="col-6"><h1 class="color2">{{day2}}</h1></div>
+                  <div class="col-6 color2 fw-bold">
+                    <div>{{monthNames[month2-1]}}</div>
+                    <div>{{year2}}</div>
+                  </div>
+               </div>
                 <vue-date-picker v-model="date2" :format="format2" :min-date="new Date()"></vue-date-picker>
               </div>
             </div>
@@ -128,8 +147,52 @@
                 </div>
               </div>
             </div>
+            <div>
+                <nav >
+          <div class="nav nav-tabs" id="nav-tab" role="tablist">
+               <button
+              class="nav-link active"
+              id="nav-arrivals-tab"
+              data-bs-toggle="tab"
+              data-bs-target="#nav-arrivals"
+              type="button"
+              role="tab"
+              aria-controls="nav-arrivals"
+              aria-selected="true"
+            >
+              <span class="rounded px-5"> {{$i18n.locale == 'ar' ? 'اقتصاد':'Economy'}}</span>
+            </button>
+           <button
+              class="nav-link "
+              id="nav-arrivals-tab"
+              data-bs-toggle="tab"
+              data-bs-target="#nav-arrivals"
+              type="button"
+              role="tab"
+              aria-controls="nav-arrivals"
+              aria-selected="true"
+            >
+              <span class="rounded px-5"> {{$i18n.locale == 'ar' ? 'عمل':'Business'}}</span>
+            </button>
+            <button
+              class="nav-link "
+              id="nav-arrivals-tab"
+              data-bs-toggle="tab"
+              data-bs-target="#nav-arrivals"
+              type="button"
+              role="tab"
+              aria-controls="nav-arrivals"
+              aria-selected="true"
+            >
+              <span class="rounded px-5"> {{$i18n.locale == 'ar' ? 'الصف الأول':'First Class'}}</span>
+            </button>
+          </div>
+        </nav>
+            </div>
             <div class="mt-5">
                
+
+
                  <button @click="gotoflightResult" class="search-button">{{$i18n.locale == 'ar' ? 'بحث الرحلة':'Search Flight'}} </button>
             </div>
       </div>
@@ -204,6 +267,15 @@ const city = ref();
 const cityto = ref();
 const showcity = ref(false);
 const showcityto = ref(false);
+const day = ref();
+const month = ref();
+const year = ref();
+const day2 = ref();
+const month2 = ref();
+const year2 = ref();
+const monthNames = ["January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"
+];
  const gotoflightResult = async () => {
    localStorage.setItem("from",codedfrom.value);
    localStorage.setItem("to",codedto.value);
@@ -228,18 +300,18 @@ const showcityto = ref(false);
  }
   const date = ref(new Date());
 const format = (date) => {
-  const day = date.getDate();
-  const month = date.getMonth() + 1;
-  const year = date.getFullYear();
+  day.value = date.getDate();
+  month.value = date.getMonth() + 1;
+  year.value = date.getFullYear();
 
-  return `${year}-${month}-${day}`;
+  return `${year.value}-${month.value}-${day.value}`;
 }
 const date2 = ref(new Date());
 const format2 = (date2) => {
-  const day = date2.getDate();
-  const month = date2.getMonth() + 1;
-  const year = date2.getFullYear();
-  return `${year}-${month}-${day}`;
+  day2.value = date2.getDate();
+  month2.value = date2.getMonth() + 1;
+  year2.value = date2.getFullYear();
+  return `${year2.value}-${month2.value}-${day2.value}`;
 }
     const fetchCities = async () => {
       const data = new URLSearchParams();
@@ -248,7 +320,8 @@ const format2 = (date2) => {
   const response = await axios.post('https://api.flyakeed.com/index.php/airport/search', data);
   if (response) {
     city.value = response.data.data;
-    showcity.value = true
+    showcity.value = true;
+    console.log(response.data.data)
   }
  
   }
@@ -285,6 +358,43 @@ setTimeout(() => {
 
   @import '~/assets/styles/scss/theme/variables';
   @import '~/assets/styles/scss/theme/mixin';
+.color2{
+  color: #1a1f71;
+}
+.nav-link{
+  padding: 15px;
+font-weight: 400;
+text-align: center;
+cursor: pointer;
+font-size: 16px;
+transition: .3s;
+color: #b2b2b2;
+border-radius: 3px;
+background-color: #fff;
+position: relative;
+&:nth-child(2){
+  &::before{
+  content: "";
+  position: absolute;
+  height: 70%;
+  background-color: #e8e7e7;
+  width: 1px;
+  right: 0;
+  top: 7px;
+  }
+}
+}
+.nav-link.active{
+  padding: 15px;
+font-weight: 400;
+text-align: center;
+cursor: pointer;
+font-size: 16px;
+transition: .3s;
+color: #fff;
+border-radius: 3px;
+background-color: #196dfb;
+}
 .search-section{
   .alert{
     position: fixed;
@@ -329,11 +439,11 @@ background-image: url("https://dsx9kbtamfpyb.cloudfront.net/desktop-web-fav4/vie
 }
 .From-search{
   background-color: #f1f1f1;
-  padding: 5px;
+  padding: 10px;
   position: relative;
   ul{
     position: absolute;
-    top: 90px;
+    top: 72px;
     border: 1px solid #ddd;
     background-color: #fff;
     width: 100%;
@@ -350,6 +460,20 @@ background-image: url("https://dsx9kbtamfpyb.cloudfront.net/desktop-web-fav4/vie
       padding: 10px;
       transition: .5s;
       cursor: pointer;
+      flex-wrap: wrap;
+      span{
+        width: 50%;
+      }
+      strong{
+        width: 50%;
+        text-align: end;
+      }
+     p{
+      color: #b3b3b3;
+      font-size: 12px;
+      width: 100%;
+      margin: 10px 0 0 0 ;
+      }
       &:hover{
         background-color: #ddd;
       }
@@ -361,7 +485,6 @@ background-image: url("https://dsx9kbtamfpyb.cloudfront.net/desktop-web-fav4/vie
   input{
     width: 100%;
     border: none;
-    padding: 10px 0;
     font-size: 20px;
     color: $blue2;
     &:focus{

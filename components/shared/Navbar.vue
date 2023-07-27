@@ -1,9 +1,9 @@
 <template>
-  <section id="nav_bar">
+  <div id="nav_bar">
            <div class="top-menu">
             <SharedMenuCenter v-if="!pending" :Menus="Menus" />
           </div>
-  </section>
+  </div>
 </template>
 <script setup>
 

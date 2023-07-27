@@ -2,7 +2,7 @@
   <div>
     <!-- Header Slider -->
     <HomeSearchSection />
-    
+    <HomeSearchSection2 />
   </div>
 </template>
 

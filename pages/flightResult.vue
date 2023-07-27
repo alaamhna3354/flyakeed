@@ -1,39 +1,81 @@
+
+
 <template>
   <div class="flights">
+    <div class="bottom-header">
+      <div class="container">
+        <div class="row" style="position: relative;">
+          <div class="col-sm-1" style="position: absolute;top: 13px;">
+            <img src="https://dsx9kbtamfpyb.cloudfront.net/desktop-web-fav4/images/arrows/back-left.png" alt="">
+          </div>
+          <div class="col-sm-3">
+            <div class="text-white text-center fw-bold h6">{{from}}-{{to}}</div>
+            <div class="text-center" style="color:#196df5">{{Adult}} Adult - Economy</div>
+          </div>
+           <div class="col-sm-3">
+            <div class="text-white text-center fw-bold h6">{{formatDate(dateStart)}}</div>
+            <div class="text-center" style="color:#196df5">Departure</div>
+          </div>
+          <div class="col-sm-3">
+            <div class="text-white text-center fw-bold h6">{{formatDate(dateEnd)}}</div>
+            <div class="text-center" style="color:#196df5">Return</div>
+          </div>
+          <div class="col-sm-3 text-end">
+            <button class="btn btn-search-outline btn-change-search p10" style="min-width:150px;background: 0 0;
+border: 1px solid #e6f0ff;
+color: #e6f0ff;
+outline: 0;
+box-shadow: none;">
+              <span class="text" data-i18n="flight.changesearch">Change Search</span>
+            </button>
+          </div>
+          
+        </div>
+      </div>
+    </div>
     <div class="container">
+      <div v-if="errorflights" style="height:500px"> 
+       <h2 class="text-center" style="color:#0a0f57;padding-top:100px">{{$i18n.locale == 'ar' ? 'لا توجد رحلات للاختيارات الاسبقة':'No flights for this route'}}</h2>
+      </div>
       <div class="loader" v-if="!loading">
-      <div class="plane">
+      <!-- <div class="plane">
         <img src="https://zupimages.net/up/19/34/4820.gif" class="plane-img">
       </div>
       <div class="earth-wrapper">
         <div class="earth"></div>
-      </div>  
+      </div>   -->
+      <h2 class="text-center mt-5" style="color:#0a0f57">{{$i18n.locale == 'ar' ? 'بحث الرحلات':'Searching Flights'}}</h2>
+      <img src="https://dsx9kbtamfpyb.cloudfront.net/desktop-web-fav4/images/search-result.gif" alt="">
     </div>
-      <div class="row pt-5" v-else>
+    
+      <div class="row pt-5" v-if="!errorflights && loading">
         <div class="col-3">
           <h5 class="color">{{$i18n.locale == 'ar' ? 'توقف':'Stops'}} </h5>
-          <div class="d-flex align-items-center mb-4">
+          <div class="d-flex align-items-center mb-4 checkbox-contain">
             <input 
               class="checkbox"
               type="checkbox"
               value="0"
+              checked
                @change="selected= $event.target.value " 
             />
+           <span class=" checkmark"></span>
             <label for="checkbox1">{{$i18n.locale == 'ar' ? 'رحلة مباشرة':'Direct Flight'}}</label>
           </div>
-          <div class="d-flex align-items-center mb-4">
+          <div class="d-flex align-items-center mb-4 checkbox-contain">
             <input 
               class="checkbox"
               type="checkbox"
               value="1"
             @change="selected= $event.target.value " 
             />
+            <span class=" checkmark"></span>
             <label for="checkbox2">{{$i18n.locale == 'ar' ? 'توقف 1':'Stops 1'}} </label>
           </div>
           <hr />
           <h5 class="color">{{$i18n.locale == 'ar' ? 'شركات الطيران':'Airlines'}} </h5>
           <div
-            class="d-flex align-items-center mb-4"
+            class="d-flex align-items-center mb-4 checkbox-contain"
             v-for="(item, key, index) in airlines"
             :key="index"
           >
@@ -46,47 +88,72 @@
             />
             <!-- :true-value="1"
                 :false-value="0" -->
+                <span class=" checkmark"></span>
             <label for="">{{ $i18n.locale == "ar" ? item.ar : item.en }}</label>
           </div>
           <hr>
            <h5 class="color">{{$i18n.locale == 'ar' ? 'الرحلات':'Flights'}}</h5>
-           <div class="d-flex align-items-center mb-4">
+           <div class="d-flex align-items-center mb-4 checkbox-contain">
             <input
-            :checked="Cheapest[0]==300" 
               class="checkbox"
               type="checkbox"
               value="300"
              @change="selectedCheapest($event.target.value)" 
             />
+            <span class=" checkmark"></span>
             <label for="checkbox2"> <img src="/icons/blue2.png" alt="" >{{$i18n.locale == 'ar' ? 'رخيص':'Cheapest'}}</label>
           </div>
-          <div class="d-flex align-items-center mb-4">
+          <div class="d-flex align-items-center mb-4  checkbox-contain">
             <input checked
               class="checkbox"
               type="checkbox"
               value="100000"
               @change="selectedCheapest($event.target.value)" 
             />
+            <span class=" checkmark"></span>
             <label for="checkbox2"> <img src="/icons/green2.png" alt="" >{{$i18n.locale == 'ar' ? 'متوفر':'Available'}}</label>
           </div>
           <hr>
           <h5 class="color">{{$i18n.locale == 'ar' ? 'السعر':'Price'}}</h5>
     <div class="d-flex justify-content-between mb-5">
-      <span>{{ value[0] }} {{currancy}}</span>
-      <span>{{ value[1] }} {{currancy}}</span>
+      <span>{{min }} {{currancy}}</span>
+      <span>{{ max }} {{currancy}}</span>
     </div>
-              <v-range-slider
-                v-model="value"
-                step="10"
-                :max="1414"
-                :min="299"
-                thumb-label="always"
-              ></v-range-slider>
+           <div class="rang">
+                 <div @mousemove="doDrag" class="outercontainer">
+    <div class="slider-container mt-5">
+      <div class="slider-content-container">
+        <div
+          @mousedown="startDrag"
+          class="drag-1"
+          :style="{ left: drag1.left + 'px' }"
+        >
+        <span>{{ Math.floor(numberLeft)  }}</span>
+        </div>
+        <div class="slider-value-background" id="slider-background"></div>
+        <div
+          class="slider-value"
+          :style="{ width: width + 'px', left: drag1.left + 'px' }"
+        >
+       
+        </div>
+        <div
+          @mousedown="startDrag2"
+          class="drag-2"
+          :style="{ left: drag2.left + 'px' }"
+        >
+         <span>{{ Math.floor(numberRight)   }}</span></div>
+      </div>
+    </div>
+  </div>
+           </div>
         </div>
         <div class="col-8">
-            <h3 class="color2 mb-5"> <i style="color:#fc4c9d" class="mdi mdi-airplane"></i>{{$i18n.locale == 'ar' ? 'عدد الرحلات':'Departure Flight'}}  ({{filterByflights.length}}) {{$i18n.locale == 'ar' ? 'في النتائج':'Results'}}  </h3>
+            <h4 class="mb-5" style="color:#114aaf;font-size: 18px;"> <i style="color:#fc4c9d;font-size: 25px;" class="mdi mdi-airplane"></i>{{$i18n.locale == 'ar' ? 'عدد الرحلات':'Departure Flight'}}  ({{filterByflights.length}}) {{$i18n.locale == 'ar' ? 'في النتائج':'Results'}}
+             <br>
+             <span style="font-size: 15px;font-weight: 400;margin-inline-start:25px ;">{{formatDate(dateStart)}}</span>
+            </h4>
           <div v-for="(item,index) in filterByflights" :key="index"
-          v-show="item.price < Cheapest && item.stops == selected && company.includes(item.marketCode)"
 
             class="animated flight-result-con mb15"
             ctype="1"
@@ -103,7 +170,7 @@
                       data-placement="top"
                       data-original-title="Flydubai"
                     >
-                      <div class="flight-image i-fz"></div>
+                      <div :class="`flight-image i-${item.marketCode}`"></div>
                     </div>
                     <p class="clearfix ellipsis">
                         {{item.marketCode+item.flightNumber}}
@@ -192,10 +259,293 @@
     </div>
   </div>
 </template>
+<style src="./Slider.scss" lang="scss"/>
+<script>
+import axios from 'axios';
+import "vue-range-slider/dist/vue-range-slider.css";
+export default {
+  layout: "app",
+  name: "profile",
+  data() {
+    return {   
+      min: "299",
+      max: "1414",
+      minNumber: 299,
+      maxNumber: 1414,
+      numberLeft: 299,
+      numberRight: 1414,
+      sliderValue: 0,
+      width: 0,
+      drag1: {
+        left: 0
+      },
+      drag2: {
+        left: 200
+      },
 
+      dragging: false,
+      dragging2: false,
+      draggable: 0,
+    loading:false,
+    errorflights:false,
+    dateStart:localStorage.getItem("dateStart"),
+    dateEnd:localStorage.getItem("dateEnd"),
+    currancy:localStorage.getItem("currancy"),
+    from:localStorage.getItem("from"),
+    to:localStorage.getItem("to"),
+    Adult:localStorage.getItem("Adult"),
+    Child:localStorage.getItem("Child"),
+    Infant:localStorage.getItem("Infant"),
+    airlines:[],
+    flights:[],
+    selected:'0',
+    company:[  ] ,
+    Cheapest:100000 ,
+    };
+  },
+  
+  components: {
+ 
+  },
+   computed: {
+         filterByflights() {   
+            if (this.numberLeft != '') { 
+           return this.flights.filter(item => {
+            return item.price >= this.numberLeft && item.price <= this.numberRight && this.company.includes(item.marketCode) && item.stops == this.selected && item.price < this.Cheapest;
+          })
+          }
+        return this.flights;
+        },
+           calcWidth() {
+      return this.drag2.left - this.drag1.left + 5;
+    },
+    isNumberKey(evt) {
+      var charCode = evt.which ? evt.which : event.keyCode;
+      if (charCode > 31 && (charCode < 48 || charCode > 57)) return false;
+
+      return true;
+    }
+  },
+
+   methods: {
+   selectedCheapest(x) {
+      this.Cheapest = x
+    },
+      numberWithCommas(x) {
+      return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "'");
+    },
+    setMin() {
+      if (
+        (/[0-9]|\./.test(String.fromCharCode(event.keyCode)) &&
+          !event.shiftKey) ||
+        this.disabledKeys.includes(event.keyCode)
+      ) {
+        const number = this.min.replace(/'/g, "");
+        this.minNumber = Number(number);
+        this.min = this.numberWithCommas(number);
+      } else {
+        this.min = this.min
+          .replace(String.fromCharCode(event.keyCode).toLowerCase(), "")
+          .replace(String.fromCharCode(event.keyCode), "");
+      }
+    },
+
+    setMax() {
+      if (
+        (/[0-9]|\./.test(String.fromCharCode(event.keyCode)) &&
+          !event.shiftKey) ||
+        this.disabledKeys.includes(event.keyCode)
+      ) {
+        const number = this.max.replace(/ /g, "_").replace(/'/g, "");
+        this.maxNumber = Number(number);
+        this.max = this.numberWithCommas(number);
+      } else {
+        this.max = this.max
+          .replace(String.fromCharCode(event.keyCode).toLowerCase(), "")
+          .replace(String.fromCharCode(event.keyCode), "");
+      }
+    },
+
+    startDrag() {
+      this.dragging = true;
+      this.draggable = 1;
+    },
+
+    startDrag2() {
+      this.dragging2 = true;
+      this.draggable = 2;
+    },
+    stopDrag() {
+      this.dragging = false;
+      this.draggable = 0;
+    },
+    stopDrag2() {
+      this.dragging2 = false;
+      this.draggable = 0;
+    },
+
+    doDrag(event) {
+      if (this.dragging || this.dragging2) {
+        if (this.draggable === 1 && this.drag1.left + 20 < this.drag2.left) {
+          const newLeft = event.clientX - 100;
+          if (
+            newLeft > 0 &&
+            newLeft + 5 <=
+              document.getElementById("slider-background").offsetWidth
+          ) {
+            this.width = this.calcWidth;
+            this.drag1.left = newLeft;
+            this.calcPercentLeft();
+          }
+        } else if (
+          this.draggable === 2 &&
+          this.drag2.left - 20 > this.drag1.left
+        ) {
+          const newLeft = event.clientX - 100;
+          if (
+            newLeft > 0 &&
+            newLeft + 5 <=
+              document.getElementById("slider-background").offsetWidth
+          ) {
+            this.width = this.calcWidth;
+            this.drag2.left = newLeft;
+            this.calcPercentRight();
+          }
+        }
+      }
+    },
+    calcPercentLeft() {
+      this.numberLeft = 0;
+      const percent =
+        (100 / document.getElementById("slider-background").offsetWidth) *
+        this.drag1.left;
+      this.numberLeft =
+        (this.maxNumber + this.minNumber) * (percent / 100).toFixed(4);
+    },
+
+    calcPercentRight() {
+      this.numberRight = 0;
+      const percent =
+        (100 / document.getElementById("slider-background").offsetWidth) *
+        this.drag2.left;
+      this.numberRight =
+        (this.maxNumber + this.minNumber) * (percent / 100).toFixed(4);
+    },
+     setCode(values) {
+       console.log(" ********** code **********",values)
+     },
+      onPriceChange(values) {
+      this.priceMin = values[0];
+      this.priceMax = values[1];
+    },
+   selectedcompany(d) {
+    if(this.company.includes(d)){
+    this.company-= ' '+d;
+    }
+    else{
+     this.company+= ' '+d;
+    }
+     console.log(this.company)
+  },
+
+       formatDate(dateStart) {
+    var d = new Date(dateStart),
+      month = "" + (d.getMonth() + 1),
+      day = "" + d.getDate(),
+      year = d.getFullYear();
+
+    if (month.length < 2) month = "0" + month;
+    if (day.length < 2) day = "0" + day;
+
+    return [year, month, day].join("-");
+  },
+   formatDate2(dateEnd) {
+    var d = new Date(dateEnd),
+      month = "" + (d.getMonth() + 1),
+      day = "" + d.getDate(),
+      year = d.getFullYear();
+
+    if (month.length < 2) month = "0" + month;
+    if (day.length < 2) day = "0" + day;
+
+    return [year, month, day].join("-");
+  },
+   async fetch(){
+      var self = this;
+        const data = new URLSearchParams();
+        data.append("from", localStorage.getItem("from"));
+        data.append("to", localStorage.getItem("to"));
+        data.append("city_search", "0");
+        data.append("date", self.formatDate(self.dateStart));
+        data.append("ret_date", self.formatDate2(self.dateEnd));
+        data.append("currency", localStorage.getItem("currancy"));
+        data.append("adult", localStorage.getItem("Adult"));
+        data.append("child", localStorage.getItem("Child"));
+        data.append("infant", localStorage.getItem("Infant"));
+        data.append("trip_type", "O");
+        data.append("n", true);
+        data.append("cabin[]", "E");
+           await axios
+            .post(`https://api.flyakeed.com/index.php/gds/flights`, data, {
+            })
+            .then(function(res) {
+              
+              if (res.status == 201 || res.status == 200) { 
+              // console.log(res.data.data.flights.render);
+              self.airlines = res.data.data.airlines;
+              self.flights = res.data.data.flights.render;
+              self.loading = true;
+              var keys = Object.keys(self.airlines)
+              self.company = keys;
+      //          const link = document.createElement('link')
+      // link.setAttribute('rel', 'stylesheet')
+      // link.setAttribute('type', 'text/css')
+      // link.setAttribute('href', '/_nuxt/assets/styles/scss/code.css')
+      // document.head.appendChild(link)
+              }
+            })
+             .catch(function(error) {
+              if (error.response) {
+               self.loading = true;
+                 self.errorflights = true;
+                console.log(error.response);
+                setTimeout(() => {
+                  self.$router.push("/");
+                }, 3000);
+              }
+            });
+     }
+  },
+  mounted() {
+    window.addEventListener("mouseup", this.stopDrag);
+    window.addEventListener("mouseup", this.stopDrag2);
+  },
+ created() {
+    this.fetch();
+     this.width = this.calcWidth;
+  },
+};
+</script>
+<script setup>
+const monthNames = ["January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"
+];
+ 
+
+
+
+onMounted(async () => {
+ 
+       
+});
+</script>
 <style lang="scss" scoped >
 @import "~/assets/styles/scss/theme/variables";
 @import "~/assets/styles/scss/theme/mixin";
+.bottom-header{
+  background-color: #0a0f57;
+  padding: 10px 0;
+}
 .flights {
   background-color: #e6f0ff;
   .full{
@@ -334,136 +684,53 @@ margin: auto;
   
 }
 }
+.checkbox-contain{
+  position: relative;
+}
+ input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+  z-index: 2;
+}
+.checkmark {
+  position: absolute;
+  left: 0;
+  height: 25px;
+  width: 25px;
+  background-color: #eee;
+  border-radius: 50%;
+}
+
+/* When the checkbox is checked, add a blue background */
+ input:checked ~ .checkmark {
+  background-color: #2196F3;
+}
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+.checkmark ~ label{
+  margin-inline-start: 30px;
+}
+/* Show the checkmark when checked */
+ input:checked ~ .checkmark:after {
+  display: block;
+}
+
+/* Style the checkmark/indicator */
+ .checkmark:after {
+  left: 10px;
+  top: 6px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 3px 3px 0;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
+}
 </style>
-<script>
-import axios from 'axios';
-
-export default {
-  layout: "app",
-  name: "profile",
-  data() {
-    return {   
-    loading:false,
-    dateStart:localStorage.getItem("dateStart"),
-    dateEnd:localStorage.getItem("dateEnd"),
-    currancy:localStorage.getItem("currancy"),
-    airlines:[],
-    flights:[],
-    selected:'0',
-    company:[  ] ,
-      value: [299, 1414],
-    };
-  },
-  
-  components: {
- 
-  },
-   computed: {
-         filterByflights() {   
-          // if (this.company.length != '') { 
-          //   return this.flights.filter(j => this.company.includes(j.marketCode))
-          // }
-            if (this.value != '') { 
-           return this.flights.filter(item => {
-            return item.price >= this.value[0] && item.price <= this.value[1];
-          })
-          }
-        return this.flights;
-        },
-  },
-   methods: {
-     
-     setCode(values) {
-       console.log(" ********** code **********",values)
-     },
-      onPriceChange(values) {
-      this.priceMin = values[0];
-      this.priceMax = values[1];
-    },
-   selectedcompany(d) {
-    if(this.company.includes(d)){
-    this.company-= ' '+d;
-    }
-    else{
-     this.company+= ' '+d;
-    }
-     console.log(this.company)
-  },
-       formatDate(dateStart) {
-    var d = new Date(dateStart),
-      month = "" + (d.getMonth() + 1),
-      day = "" + d.getDate(),
-      year = d.getFullYear();
-
-    if (month.length < 2) month = "0" + month;
-    if (day.length < 2) day = "0" + day;
-
-    return [year, month, day].join("-");
-  },
-   formatDate2(dateEnd) {
-    var d = new Date(dateEnd),
-      month = "" + (d.getMonth() + 1),
-      day = "" + d.getDate(),
-      year = d.getFullYear();
-
-    if (month.length < 2) month = "0" + month;
-    if (day.length < 2) day = "0" + day;
-
-    return [year, month, day].join("-");
-  },
-   async fetch(){
-      var self = this;
-        const data = new URLSearchParams();
-        data.append("from", localStorage.getItem("from"));
-        data.append("to", localStorage.getItem("to"));
-        data.append("city_search", "0");
-        data.append("date", self.formatDate(self.dateStart));
-        data.append("ret_date", self.formatDate2(self.dateEnd));
-        data.append("currency", localStorage.getItem("currancy"));
-        data.append("adult", localStorage.getItem("Adult"));
-        data.append("child", localStorage.getItem("Child"));
-        data.append("infant", localStorage.getItem("Infant"));
-        data.append("trip_type", "O");
-        data.append("n", true);
-        data.append("cabin[]", "E");
-           await axios
-            .post(`https://api.flyakeed.com/index.php/gds/flights`, data, {
-            })
-            .then(function(res) {
-              
-              if (res.status == 201 || res.status == 200) { 
-              // console.log(res.data.data.flights.render);
-              self.airlines = res.data.data.airlines;
-              self.flights = res.data.data.flights.render;
-              self.loading = true;
-              var keys = Object.keys(self.airlines)
-              self.company = keys;
-              }
-            })
-             .catch(function(error) {
-              if (error.response) {
-              
-                console.log(error.response);
-              }
-            });
-     }
-  },
- created() {
-    this.fetch();
-  },
-};
-</script>
-<script setup>
-const Cheapest = ref(100000);
-
- const selectedCheapest = (s) => {
-    Cheapest.value = s
- }
-
-
-
-onMounted(async () => {
- 
-       
-});
-</script>

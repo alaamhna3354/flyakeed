@@ -36,25 +36,18 @@
                   >
                 </div>
               </div>
-     <div class="dropdown show">
-                <nuxt-link to="" class="drop dropdown-toggle"
-                  ><font-awesome-icon style="margin-inline-end: .5rem" :icon="['fas', 'earth-americas']" /></nuxt-link
+     <div class="text-white">
+                <nuxt-link @click="changeLanuage" to="" class="text-white" style="font-size: 16px;font-weight: 501;cursor: pointer;"
+                  >
+                 {{$i18n.locale == 'ar' ? 'English':'العربية'}}
+                  </nuxt-link
                 >
-                <div class="dropdown-content p-0 m-0">
-                  <a @click="changeLanuage"
-                    href="#"
-                    class="list-group-item list-group-item-action d-flex py-3 dropdown-item"
-                    >
-                    <span style="padding-inline-start: 1rem">Arabic</span></a
-                  >
-                  <a @click="changeLanuage"
-                    href="#"
-                    class="list-group-item list-group-item-action d-flex py-3 dropdown-item"
-                    >
-                    <span style="padding-inline-start: 1rem">English</span></a
-                  >
-                </div>
               </div>
+   </div>
+   <div class="d-flex">
+         <button>Corporate</button>
+         <button class="wh">Log In</button>
+
    </div>
     </div>
 </template>
@@ -89,11 +82,25 @@ const changeLanuage = () => {
 <style lang="scss" scoped>
 @import "~/assets/styles/scss/theme/variables";
 @import "~/assets/styles/scss/theme/mixin";
+
 .menu-center {
  background-color: $blue2;
  padding: 20px 100px;
  display: flex;
  justify-content: space-between;
+ button{
+   border-radius: 1px;
+    background: #196dfb;
+    width: 120px;
+    height: 40px;
+    text-align: center;
+      color: #fff;
+      margin-inline-end: 10px;
+    &.wh{
+    background: #fff;
+      color: #196dfb;
+    }
+ }
  .logo{
    display: flex;
    align-items: center;

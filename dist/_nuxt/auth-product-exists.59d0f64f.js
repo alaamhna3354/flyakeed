@@ -1,0 +1,1 @@
+import{B as a,C as u,z as s,D as o}from"./entry.4caafed9.js";const i=a(()=>{{const e=u(),t=useCart().value;if(!e.value.isAuthenticated)return s("/auth/login",{redirectCode:301});if(!t.items.length&&t.totalQty<0||t.totalQty==0)return o().back()}});export{i as default};
